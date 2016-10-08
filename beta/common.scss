@@ -1,0 +1,20 @@
+@import "base";
+html,body{
+    height: 100%;
+}
+.wraps,.wrap{
+    position: relative;
+    width: 80%;
+    height: 80%;
+    top: 10%;
+    font-size: 20px;
+    margin: 0 auto 50px;
+    h2{
+        font-weight: bold;
+        line-height: 2;
+    }
+    p{
+        text-indent: 1rem;
+        margin-bottom: 10px;
+    }
+}

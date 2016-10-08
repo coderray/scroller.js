@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title>基于zepto的自定义滚动条</title>
+		<link rel="stylesheet" type="text/css" href="common.css"/>
+	</head>
+	<body>
+		<div class="wraps wrap">
+			<div class="inner">
+				<h2>这是一个标题哦</h2>
+				<p>萨啊大大大大阿诗丹顿啊大按时按时啊按时按时啊按时啊是按时按时啊按时按时啊按时啊是按时按时啊按时按时啊按时啊是按时按时啊按时按时啊按时啊是按时啊啊</p>
+				<p>时按时啊按时按时啊按时啊是按时按时啊按时按时啊按时啊是按时按时啊按时按时啊按时啊是按时按时啊按时按时啊按时啊是按时按时啊按时按时啊按时啊是按</p>
+				<h2>还有其他标题</h2>
+				<p>看见看见的看过的客服即可得即可地方的咖啡机地方地方啊阿道夫答复老地方就垃圾的罚款减肥按时</p>
+				<h2>还有其他标题</h2>
+				<p>看见看见的看过的客服即可得即可地方的咖啡机看见看见的看过的客服即可得即可地方的咖啡机看见看见的看过的客服即可得即可地方的咖啡机看见看见的看过的客服即可得即可地方的咖啡机看见看见的看过的客服即可得即可地方的咖啡机地方地方啊阿道夫答复老地方就垃圾的罚款减肥按时</p>
+				<p>看见看见的看过的客服即可得即可地方的咖啡机地方地方啊阿道夫答复老地方就垃圾的罚款减肥按时</p>
+				<h2>还有其他标题</h2>
+				<p>看见看见的看过的客服即可得即可地方的咖啡机地方地方啊阿道夫答复老地方就垃圾的罚款减肥按时</p>
+				
+			</div>
+		</div>
+		<div class="wraps" id="wrap1">
+			<div class="inner">
+				<h2>这是一个标题哦</h2>
+				<p>萨啊大大大大阿诗丹顿啊大按时按时啊按时按时啊按时啊是按时按时啊按时按时啊按时啊是按时按时啊按时按时啊按时啊是按时按时啊按时按时啊按时啊是按时啊啊</p>
+				<p>时按时啊按时按时啊按时啊是按时按时啊按时按时啊按时啊是按时按时啊按时按时啊按时啊是按时按时啊按时按时啊按时啊是按时按时啊按时按时啊按时啊是按</p>
+				<h2>还有其他标题</h2>
+				<p>看见看见的看过的客服即可得即可地方的咖啡机地方地方啊阿道夫答复老地方就垃圾的罚款减肥按时</p>
+				<h2>还有其他标题</h2>
+				<p>看见看见的看过的客服即可得即可地方的咖啡机看见看见的看过的客服即可得即可地方的咖啡机看见看见的看过的客服即可得即可地方的咖啡机看见看见的看过的客服即可得即可地方的咖啡机看见看见的看过的客服即可得即可地方的咖啡机地方地方啊阿道夫答复老地方就垃圾的罚款减肥按时</p>
+				<p>看见看见的看过的客服即可得即可地方的咖啡机地方地方啊阿道夫答复老地方就垃圾的罚款减肥按时</p>
+				<h2>还有其他标题</h2>
+				<p>看见看见的看过的客服即可得即可地方的咖啡机地方地方啊阿道夫答复老地方就垃圾的罚款减肥按时</p>
+				
+			</div>
+		</div>
+		<script src="zepto.min.js"></script>
+		<script src="JMscroller.js"></script>
+		<script type="text/javascript">
+			/*
+			 *	本插件不依赖于JQ,但建议在文档加载完全后再实例化滚动条
+			 */
+			$(function(){
+				/*	
+				 * 	实例化方法一：
+				 *	设置自定义参数
+				 * 	id/class 	{string} 	id或class选择器
+				 * 	opts 		{object}	配置项
+				 */
+				var jm = new JMscroller(".wrap",{
+					'show':true,//boolean,是否显示滚动条
+					'auto':true,//boolean,是否自动加载滚动条
+					'width':'4px',//string,滚动条宽度
+					"height":'100%',//string,滚动条高度
+					"top":"0",//string,滚动条top值
+					'right':'-4px',//string,滚动条right值，设置此值后position失效
+					'position':'inside',//滚动条位置,'inside'、'outside'分别代表里面和外面
+					'speed':'normal',//string:默认是'normal',可设置'fast'选择更快速度;number:基准是1,数字越大速度越快
+					'color':'rgba(255,255,255,0.6)',//string,滚动条颜色
+					'bgColor':'rgba(0,0,0,0.6)',//string,滚动条背景色
+					'onScroll':function(){
+						//滑动时回调函数
+						console.log("scroll");
+					},
+					'onTop':function(){
+						//到达顶部回调函数
+						console.log('top')
+					},
+					'onBottom':function(){
+						//到达底部回调函数
+						console.log("bottom")
+					}
+				});
+				//实例化方法二：
+				//直接使用默认配置
+				var jm1 = new JMscroller("#wrap1");
+				/*
+				 *	重设高度比例 
+				 * 	当内容高度改变时，可调用resize方法重设滚动条
+				 */
+				//jm1.resize();
+			});
+		</script>
+	</body>
+</html>
