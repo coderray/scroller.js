@@ -1,3 +1,8 @@
+/*
+ *	JMscroller.js,基于原生JS的移动端自定义滚动条插件
+ *	2016.10.10
+ * 	Ray
+ */
 ;(function (root, factory) {
   if (typeof exports === 'object') {
     module.exports = factory();
@@ -27,9 +32,18 @@
 				'onBottom':function(){},
 				'onTop':function(){}
 			};
+	//私有方法
+	var _translate = function(obj,num){
+		obj.style.transform = "translateY(" + num + "px)";
+		obj.style.webkitTransform = "translateY(" + num + "px)";
+	}
+	var _getStyle = function(dom, attr){
+	  return dom.currentStyle ? dom.currentStyle[attr] : getComputedStyle(dom, false)[attr];
+	}
 	//contructor
 	function scroll(ele,opts){
-		var def = _def,
+		var _t = this,
+				def = _def,
 				target,//目标
 				outter = document.createElement("div"),//包裹层
 				inner = document.createElement("div"),
@@ -96,6 +110,7 @@
 		inner.appendChild(content);
 		target.appendChild(outter);
 		//初始化
+		this.inited = false;
 		this.Version = "1.0";
 		this.Date = "written on 2016.9.30";
 		this.target = target;
@@ -108,68 +123,81 @@
 		this.curP = 0;//当前位置
 		this.lastP = '';//最后一个点
 		this.scaleY = -1;//内容与滚动条高比
+		//监听触摸
+		this.onStart = function(e){
+			var e = e || event;
+			e.preventDefault();
+			_t.lastP = e.touches[0].clientY;
+			return false;
+		}
+		//监听滑动
+		this.onMove = function(e){
+			var e = e || event;
+			e.preventDefault();
+			var y = e.touches[0].clientY;
+			if(_t.lastP){
+				var temp = _t.curP +(y - _t.lastP)*_t.speed;
+				if(temp <= 0 && temp >= _t.tH - _t.cH){
+					_t.curP += (y - _t.lastP)*_t.speed;
+					_translate(_t.content,_t.curP);
+					_translate(_t.bar,_t.curP*_t.scaleY);
+					_t.lastP = y;
+					typeof _t.def.onScroll == 'function' && _t.def.onScroll();
+				}else{
+					if(temp > 0){
+						_translate(_t.content,0);
+						_translate(_t.bar,0);
+						(_t.curP != 0 && typeof _t.def.onTop == 'function') && _t.def.onTop();
+						_t.curP = 0;
+					}else{
+						var _b = _t.tH - _t.cH;
+						_translate(_t.content,_b);
+						_translate(_t.bar,_b*_t.scaleY);
+						(_t.curP != _b && typeof _t.def.onBottom == 'function') && _t.def.onBottom();
+						_t.curP = _b;
+					}
+				}
+			}else{
+				_t.lastP = y;
+			}
+			_t.lastP = e.touches[0].clientY;
+			return false;
+		}
 		//init
-		def.auto && this.init();
+		def.auto && this.resize();
 	}
-	//私有方法
-	var _translate = function(obj,num){
-		obj.style.transform = "translateY(" + num + "px)";
-		obj.style.webkitTransform = "translateY(" + num + "px)";
-	}
-
 	//重写原型,添加公共方法
 	scroll.fn = scroll.prototype = {
 		"init":function(){
-			this.resize();
-			var _t = this;
-			this.target.addEventListener("touchstart",function(e){
-				var e = e || event;
-				e.preventDefault();
-				_t.lastP = e.touches[0].clientY;
-				return false;
-			},false);
-			this.target.addEventListener("touchmove",function(e){
-				var e = e || event;
-				e.preventDefault();
-				var y = e.touches[0].clientY;
-				if(_t.lastP){
-					var temp = _t.curP +(y - _t.lastP)*_t.speed;
-					if(temp <= 0 && temp >= _t.tH - _t.cH){
-						_t.curP += (y - _t.lastP)*_t.speed;
-						_translate(_t.content,_t.curP);
-						_translate(_t.bar,_t.curP*_t.scaleY);
-						_t.lastP = y;
-						typeof _t.def.onScroll == 'function' && _t.def.onScroll();
-					}else{
-						if(temp > 0){
-							_translate(_t.content,0);
-							_translate(_t.bar,0);
-							(_t.curP != 0 && typeof _t.def.onTop == 'function') && _t.def.onTop();
-							_t.curP = 0;
-						}else{
-							var _b = _t.tH - _t.cH;
-							_translate(_t.content,_b);
-							_translate(_t.bar,_b*_t.scaleY);
-							(_t.curP != _b && typeof _t.def.onBottom == 'function') && _t.def.onBottom();
-							_t.curP = _b;
-						}
-					}
-				}else{
-					_t.lastP = y;
-				}
-				_t.lastP = e.touches[0].clientY;
-				return false;
-			},true);
+			this.inited = true;
+			//触碰屏幕
+			this.target.addEventListener("touchstart",this.onStart,false);
+			//移动手指
+			this.target.addEventListener("touchmove",this.onMove,true);
 			//初始化完毕再显示
 			this.bg.style.visibility = "visible";		
 		},
+		'unbind':function(){
+			this.target.removeEventListener('touchstart',this.onStart,false);
+			this.target.removeEventListener('touchmove',this.onMove,true);
+		},
 		"resize":function(){
-			var _t = this;
-			_t.tH = _t.target.offsetHeight;
+			var _t = this,
+					padding = parseInt(_getStyle(_t.target,'paddingTop')) + parseInt(_getStyle(_t.target,'paddingBottom'));
+			_t.tH = _t.target.offsetHeight - padding;
 			_t.cH = _t.content.offsetHeight;
-			_t.bH = _t.bg.offsetHeight;
-			_t.bar.style.height = _t.bH*(_t.tH/_t.cH) + "px";
-			_t.scaleY = -(_t.bH/_t.tH)*(_t.tH/_t.cH);
+			if(_t.cH > _t.tH){
+				_t.bH = _t.bg.offsetHeight;
+				_t.bar.style.height = _t.bH*(_t.tH/_t.cH) + "px";
+				_t.scaleY = -(_t.bH/_t.tH)*(_t.tH/_t.cH);
+				_t.init();
+			}else{
+				_t.bg.style.visibility = 'hidden';
+				_t.inited && _t.unbind();
+				_translate(_t.content,0);
+				_translate(_t.bar,0);
+				console.log("内容过少,不显示滚动条.");
+			}
 			console.log("resize");
 		}
 	}
